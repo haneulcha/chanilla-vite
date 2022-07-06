@@ -1,17 +1,48 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <title>고양이 사진첩!</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="/src/styles/index.css" />
-    <title>Vite App</title>
+    <link rel="stylesheet" href="./src/styles/index.css" />
   </head>
   <body>
-    <header>
-      <h1>Hello World</h1>
-    </header>
-    <div id="app"></div>
-    <script type="module" src="/src/main.js"></script>
+    <h1>고양이 사진첩</h1>
+    <main class="App">
+      <nav class="Breadcrumb">
+        <div>root</div>
+        <div>노란고양이</div>
+      </nav>
+      <div class="Nodes" id="nodeWrapper">
+        <div class="Node">
+          <img src="./assets/prev.png" />
+        </div>
+        <div class="Node">
+          <img src="./assets/directory.png" />
+          <div>2021/04</div>
+        </div>
+        <div class="Node">
+          <img src="./assets/file.png" />
+          <div>하품하는 사진</div>
+        </div>
+      </div>
+    </main>
+    <!-- Loading Layer sample markup -->
+    <!--
+    <div class="Modal Loading">
+      <div class="content">
+        <img src="./assets/loading.jpeg">
+      </div>
+    </div>
+  -->
+
+    <!-- ImageViewer sample markup -->
+    <!--
+    <div class="Modal ImageViewer">
+      <div class="content">
+        <img src="./assets/sample.jpeg">
+    </div>
+    -->
+    <script src="./src/main.js" type="module"></script>
   </body>
 </html>
