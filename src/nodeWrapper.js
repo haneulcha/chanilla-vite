@@ -1,38 +1,61 @@
 const ROOT_API =
   "https://zl3m4qq0l9.execute-api.ap-northeast-2.amazonaws.com/dev";
+
+// const IMG_API = "http://placekitten.com/g/200/300";
 class NodeWrapper {
   // #nodeWrapper
   constructor(nodeId) {
     this.nodeElement = document.getElementById(nodeId);
     this.rootData = [];
+    this.imageData;
+    this.eventHandler = (evt) => this.linkToPathEvent(evt);
     this.loadRootList();
   }
 
   async loadRootList() {
     try {
-      const res = await fetch(ROOT_API);
-      this.rootData = await res.json();
+      this.rootData = await fetch(ROOT_API).then((res) => res.json());
       this.render();
     } catch (err) {
-      console.log(err);
-      console.log("error");
+      console.log("error :: loadRootList", err);
     }
   }
 
-  linkToPathEvent(e) {
+  async fetchInfo(type, _path) {
+    if (!_path) return;
+    let path = _path;
+    if (_path[0] === "/") {
+      path = _path.slice(1);
+    }
+
+    if (type === "FILE") {
+      // show modal
+      return;
+    }
+
+    try {
+      const res = await fetch(`${ROOT_API}/${path}`).then((res) => res.json());
+      console.log({ res });
+      this.rootData = res;
+      this.render();
+      return res;
+    } catch (err) {
+      console.log("error :: fetchNode", err);
+    }
+  }
+
+  async linkToPathEvent(e) {
     let node = e.target.closest("div.Node");
-    if (!node) return;
+    if (!node || !this) return;
     if (node.dataset.type === "file") {
-      console.log("file clicked");
-      console.log(node.dataset.path);
+      this.fetchInfo("FILE", node.dataset.path);
     } else {
-      console.log("directory clicked");
-      console.log(node.id);
+      this.fetchInfo("DIRECTORY", node.id);
     }
   }
 
   render() {
-    this.nodeElement.removeEventListener("click", this.linkToPathEvent);
+    this.nodeElement.removeEventListener("click", this.eventHandler);
     this.nodeElement.innerHTML = "";
     if (this.rootData[0].parent) {
       const goback = document.createElement("div");
@@ -49,8 +72,8 @@ class NodeWrapper {
       title.innerText = data.name ?? "";
       if (data.type === "FILE") {
         img.src = `./assets/file.png`;
-        node.classList.add("file");
         node.dataset.type = "file";
+        node.classList.add("file");
         node.dataset.path = data.filePath;
       } else {
         img.src = `./assets/directory.png`;
@@ -60,7 +83,7 @@ class NodeWrapper {
       node.appendChild(img);
       node.appendChild(title);
       this.nodeElement.appendChild(node);
-      this.nodeElement.addEventListener("click", this.linkToPathEvent);
+      this.nodeElement.addEventListener("click", this.eventHandler);
     }
   }
 }
