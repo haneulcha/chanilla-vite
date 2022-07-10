@@ -1,11 +1,12 @@
 const ROOT_API =
   "https://zl3m4qq0l9.execute-api.ap-northeast-2.amazonaws.com/dev";
 
-// const IMG_API = "http://placekitten.com/g/200/300";
+const IMG_API = "http://placekitten.com/g/200/300";
 class NodeWrapper {
   // #nodeWrapper
-  constructor(nodeId) {
+  constructor(nodeId, modalEl) {
     this.nodeElement = document.getElementById(nodeId);
+    this.modalElement = modalEl;
     this.rootData = [];
     this.imageData;
     this.eventHandler = (evt) => this.linkToPathEvent(evt);
@@ -21,21 +22,11 @@ class NodeWrapper {
     }
   }
 
-  async fetchInfo(type, _path) {
-    if (!_path) return;
-    let path = _path;
-    if (_path[0] === "/") {
-      path = _path.slice(1);
-    }
-
-    if (type === "FILE") {
-      // show modal
-      return;
-    }
-
+  async fetchInfo(path) {
     try {
       const res = await fetch(`${ROOT_API}/${path}`).then((res) => res.json());
       console.log({ res });
+      if (!res.length) return;
       this.rootData = res;
       this.render();
       return res;
@@ -46,18 +37,24 @@ class NodeWrapper {
 
   async linkToPathEvent(e) {
     let node = e.target.closest("div.Node");
+    console.log({ node });
+    console.log(node.dataset.type);
+    console.log(node.id);
+
     if (!node || !this) return;
     if (node.dataset.type === "file") {
-      this.fetchInfo("FILE", node.dataset.path);
+      this.modalElement.show(IMG_API);
+      // this.modalElement.show(node.dataset.path);
     } else {
-      this.fetchInfo("DIRECTORY", node.id);
+      this.fetchInfo(node.id);
     }
   }
 
   render() {
     this.nodeElement.removeEventListener("click", this.eventHandler);
     this.nodeElement.innerHTML = "";
-    if (this.rootData[0].parent) {
+    // 뒤로가기
+    if (!this.rootData[0].parent) {
       const goback = document.createElement("div");
       const gobackImg = document.createElement("img");
       gobackImg.src = "./assets/prev.png";

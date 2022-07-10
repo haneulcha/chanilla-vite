@@ -61,7 +61,8 @@ body {
   content: "";
 }
 
-.Modal {
+.ModalWrapper {
+  display: none;
   z-index: 1;
   width: 100%;
   height: 100%;
@@ -71,7 +72,11 @@ body {
   background-color: rgba(0, 0, 0, 0.3);
 }
 
-.Modal > div {
+.ModalWrapper.show {
+  display: block;
+}
+
+.ModalWrapper > div {
   position: fixed;
   left: 50%;
   top: 50%;
