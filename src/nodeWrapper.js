@@ -4,13 +4,20 @@ const ROOT_API =
 const IMG_API = "http://placekitten.com/g/200/300";
 class NodeWrapper {
   // #nodeWrapper
-  constructor(nodeId, modalEl) {
+  constructor(nodeId, modalEl, pathEl) {
     this.nodeElement = document.getElementById(nodeId);
     this.modalElement = modalEl;
+    this.pathEl = pathEl;
     this.rootData = [];
     this.imageData;
     this.eventHandler = (evt) => this.linkToPathEvent(evt);
+    this.gobackHandler = (evt) => this.onGoback(evt);
     this.loadRootList();
+  }
+
+  onGoback() {
+    const result = this.pathEl.popPath();
+    this.fetchInfo(result.parent);
   }
 
   async loadRootList() {
@@ -22,9 +29,9 @@ class NodeWrapper {
     }
   }
 
-  async fetchInfo(path) {
+  async fetchInfo(id) {
     try {
-      const res = await fetch(`${ROOT_API}/${path}`).then((res) => res.json());
+      const res = await fetch(`${ROOT_API}/${id}`).then((res) => res.json());
       console.log({ res });
       if (!res.length) return;
       this.rootData = res;
@@ -37,16 +44,18 @@ class NodeWrapper {
 
   async linkToPathEvent(e) {
     let node = e.target.closest("div.Node");
-    console.log({ node });
-    console.log(node.dataset.type);
-    console.log(node.id);
 
     if (!node || !this) return;
     if (node.dataset.type === "file") {
       this.modalElement.show(IMG_API);
       // this.modalElement.show(node.dataset.path);
     } else {
-      this.fetchInfo(node.id);
+      const result = await this.fetchInfo(node.id);
+      this.pathEl.addPath({
+        id: result.id,
+        name: result.name,
+        parent: result.parent,
+      });
     }
   }
 
@@ -54,11 +63,14 @@ class NodeWrapper {
     this.nodeElement.removeEventListener("click", this.eventHandler);
     this.nodeElement.innerHTML = "";
     // 뒤로가기
-    if (!this.rootData[0].parent) {
-      const goback = document.createElement("div");
-      const gobackImg = document.createElement("img");
-      gobackImg.src = "./assets/prev.png";
-      this.nodeElement.appendChild(goback);
+    if (this.rootData[0].parent !== null) {
+      const prev = document.createElement("div");
+      const prevIcon = document.createElement("img");
+      prevIcon.src = "./assets/prev.png";
+      prev.appendChild(prevIcon);
+      prev.classList.add("Node", "prev");
+      prev.addEventListener("click", this.gobackHandler);
+      this.nodeElement.appendChild(prev);
     }
     for (const data of this.rootData) {
       const node = document.createElement("div");
