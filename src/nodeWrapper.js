@@ -1,15 +1,13 @@
 const IMG_API = "http://placekitten.com/g/200/300";
 class NodeWrapper {
   // #nodeWrapper
-  constructor(nodeId, modalEl, state) {
-    this.nodeElement = document.getElementById(nodeId);
-    this.modalElement = modalEl;
-    this.state = state;
+  constructor() {
+    this.nodeElement = document.getElementById("nodeWrapper");
+    // this.modalElement = modalEl;
+
     this.imageData;
     this.eventHandler = (evt) => this.linkToPathEvent(evt);
     this.gobackHandler = (evt) => this.onGoback(evt);
-    this.state.addPath().then((res) => console.log(res));
-    console.log("nodeWrapper constructor", this.state);
   }
 
   onGoback() {
@@ -28,23 +26,21 @@ class NodeWrapper {
     }
   }
 
-  render(path) {
-    console.log({ path });
+  render(state) {
     this.nodeElement.removeEventListener("click", this.eventHandler);
     this.nodeElement.innerHTML = "";
     // 뒤로가기
-    if (path[0].parent !== null) {
-      const prev = document.createElement("div");
-      const prevIcon = document.createElement("img");
-      prevIcon.src = "./assets/prev.png";
-      prev.appendChild(prevIcon);
-      prev.classList.add("Node", "prev");
-      prev.addEventListener("click", this.gobackHandler);
-      this.nodeElement.appendChild(prev);
-    }
-    console.log({ state: path });
-    for (const data of path) {
-      console.log({ data });
+    // if (path[0].parent !== null) {
+    //   const prev = document.createElement("div");
+    //   const prevIcon = document.createElement("img");
+    //   prevIcon.src = "./assets/prev.png";
+    //   prev.appendChild(prevIcon);
+    //   prev.classList.add("Node", "prev");
+    //   prev.addEventListener("click", this.gobackHandler);
+    //   this.nodeElement.appendChild(prev);
+    // }
+
+    for (const data of state) {
       const node = document.createElement("div");
       const img = document.createElement("img");
       const title = document.createElement("div");
