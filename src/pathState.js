@@ -1,9 +1,8 @@
 class pathState {
-  constructor(pathEl) {
+  constructor(pathEl, state) {
     this.initialized = false;
     this.pathEl = document.getElementsByClassName(pathEl)[0];
-
-    this.pathList = [{ id: null, name: "root", parent: null }];
+    this.state = state;
     this.onClick = (e) => this.onClickPath(e);
     this.render();
   }
@@ -12,7 +11,8 @@ class pathState {
     const target = e.target.closest(".path");
     if (!target) return;
     const idx = target.dataset.idx;
-    this.slicePath(idx);
+    this.state.slicePath(idx);
+    // this.render();
     // 리스트 업데이트
   }
 
@@ -25,22 +25,22 @@ class pathState {
     클릭 slice: GET -> 선택한 폴더로 이동, -> 리렌더링
   */
 
-  addPath(path) {
-    this.pathList.push(path);
-    this.render();
-  }
+  // addPath(path) {
+  //   this.pathList.push(path);
+  //   this.render();
+  // }
 
-  popPath() {
-    const result = this.pathList.pop();
-    this.render();
-    return result;
-  }
+  // popPath() {
+  //   const result = this.pathList.pop();
+  //   this.render();
+  //   return result;
+  // }
 
-  slicePath(idx) {
-    this.pathList = this.pathList.slice(0, +idx + 1);
-    this.render();
-    return this.pathList[idx];
-  }
+  // slicePath(idx) {
+  //   this.pathList = this.pathList.slice(0, +idx + 1);
+  //   this.render();
+  //   return this.pathList[idx];
+  // }
 
   render() {
     if (this.initialized) {
@@ -48,7 +48,7 @@ class pathState {
       this.pathEl.innerHTML = "";
     }
 
-    this.pathList.forEach(({ id, name }, idx) => {
+    this.state.currentPath.forEach(({ id, name }, idx) => {
       const pathItem = document.createElement("span");
       pathItem.innerText = name;
       pathItem.id = id;

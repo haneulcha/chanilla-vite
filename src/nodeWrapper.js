@@ -1,45 +1,19 @@
-const ROOT_API =
-  "https://zl3m4qq0l9.execute-api.ap-northeast-2.amazonaws.com/dev";
-
 const IMG_API = "http://placekitten.com/g/200/300";
 class NodeWrapper {
   // #nodeWrapper
-  constructor(nodeId, modalEl, pathEl) {
+  constructor(nodeId, modalEl, state) {
     this.nodeElement = document.getElementById(nodeId);
     this.modalElement = modalEl;
-    this.pathEl = pathEl;
-    this.rootData = [];
+    this.state = state;
     this.imageData;
     this.eventHandler = (evt) => this.linkToPathEvent(evt);
     this.gobackHandler = (evt) => this.onGoback(evt);
-    this.loadRootList();
+    this.state.addPath().then((res) => console.log(res));
+    console.log("nodeWrapper constructor", this.state);
   }
 
   onGoback() {
-    const result = this.pathEl.popPath();
-    this.fetchInfo(result.parent);
-  }
-
-  async loadRootList() {
-    try {
-      this.rootData = await fetch(ROOT_API).then((res) => res.json());
-      this.render();
-    } catch (err) {
-      console.log("error :: loadRootList", err);
-    }
-  }
-
-  async fetchInfo(id) {
-    try {
-      const res = await fetch(`${ROOT_API}/${id}`).then((res) => res.json());
-      console.log({ res });
-      if (!res.length) return;
-      this.rootData = res;
-      this.render();
-      return res;
-    } catch (err) {
-      console.log("error :: fetchNode", err);
-    }
+    this.state.popPath();
   }
 
   async linkToPathEvent(e) {
@@ -50,20 +24,16 @@ class NodeWrapper {
       this.modalElement.show(IMG_API);
       // this.modalElement.show(node.dataset.path);
     } else {
-      const result = await this.fetchInfo(node.id);
-      this.pathEl.addPath({
-        id: result.id,
-        name: result.name,
-        parent: result.parent,
-      });
+      this.state.addPath();
     }
   }
 
-  render() {
+  render(path) {
+    console.log({ path });
     this.nodeElement.removeEventListener("click", this.eventHandler);
     this.nodeElement.innerHTML = "";
     // 뒤로가기
-    if (this.rootData[0].parent !== null) {
+    if (path[0].parent !== null) {
       const prev = document.createElement("div");
       const prevIcon = document.createElement("img");
       prevIcon.src = "./assets/prev.png";
@@ -72,7 +42,9 @@ class NodeWrapper {
       prev.addEventListener("click", this.gobackHandler);
       this.nodeElement.appendChild(prev);
     }
-    for (const data of this.rootData) {
+    console.log({ state: path });
+    for (const data of path) {
+      console.log({ data });
       const node = document.createElement("div");
       const img = document.createElement("img");
       const title = document.createElement("div");
