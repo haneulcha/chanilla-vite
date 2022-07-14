@@ -1,17 +1,17 @@
 class pathState {
-  constructor(pathEl, state) {
+  constructor({ onClick }) {
     this.initialized = false;
-    this.pathEl = document.getElementsByClassName(pathEl)[0];
-    this.state = state;
-    this.onClick = (e) => this.onClickPath(e);
-    this.render();
+    this.pathEl = document.querySelector(".Breadcrumb");
+    this.onClick = onClick;
+    this.onClickHandler = (e) => this.onClickPath(e);
   }
 
   onClickPath(e) {
     const target = e.target.closest(".path");
     if (!target) return;
     const idx = target.dataset.idx;
-    this.state.slicePath(idx);
+    this.onClick(idx);
+    // this.state.slicePath(idx);
     // this.render();
     // 리스트 업데이트
   }
@@ -42,13 +42,13 @@ class pathState {
   //   return this.pathList[idx];
   // }
 
-  render() {
+  render(path) {
     if (this.initialized) {
-      this.pathEl.removeEventListener("click", this.onClick);
+      this.pathEl.removeEventListener("click", this.onClickHandler);
       this.pathEl.innerHTML = "";
     }
 
-    this.state.currentPath.forEach(({ id, name }, idx) => {
+    path.forEach(({ id, name }, idx) => {
       const pathItem = document.createElement("span");
       pathItem.innerText = name;
       pathItem.id = id;
@@ -57,7 +57,7 @@ class pathState {
       this.pathEl.appendChild(pathItem);
     });
 
-    this.pathEl.addEventListener("click", this.onClick);
+    this.pathEl.addEventListener("click", this.onClickHandler);
     this.initialized = true;
   }
 }

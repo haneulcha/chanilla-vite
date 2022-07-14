@@ -1,5 +1,5 @@
 import NodeList from "./nodeWrapper.js";
-// import pathState from "./pathState.js";
+import pathList from "./pathState.js";
 // import Modal from "./modal.js";
 
 const ROOT_API =
@@ -25,13 +25,29 @@ function App(elementId) {
   // 왜 this ?
   this.appEl = document.getElementById(elementId);
   this.state = [];
+  this.path = [{ id: null, name: "root" }];
   this.setState = (newState) => {
-    console.log({ type: "setState", curState: this.state, newState });
     this.state = newState;
     this.render();
   };
 
-  this.nodeList = new NodeList();
+  this.nodeList = new NodeList({
+    onClick: async (id) => {
+      const res = await getNodes(id);
+      const curNode = this.state.find((node) => node.id === id);
+      this.path.push({ id, name: curNode.name });
+      this.setState(res);
+    },
+  });
+
+  this.pathList = new pathList({
+    onClick: async (idx) => {
+      this.path = this.path.slice(0, +idx + 1);
+      const curDirId = this.path[this.path.length - 1].id;
+      const res = await getNodes(curDirId);
+      this.setState(res);
+    },
+  });
   /* 파일 구조
     현재 디렉토리 -> fetch(현재 디렉토리 id) -> 디렉토리 내 파일 업데이트
     파일 선택 -> 현재 디렉토리 업데이트 -> fetch(현재 디렉토리 id) -> 디렉토리 내 파일 업데이트
@@ -86,6 +102,11 @@ function App(elementId) {
   //   this.state
   // );
 
+  this.render = () => {
+    this.nodeList.render(this.state);
+    this.pathList.render(this.path);
+  };
+
   const init = async () => {
     try {
       const res = await getNodes();
@@ -96,10 +117,6 @@ function App(elementId) {
   };
 
   init();
-
-  this.render = () => {
-    this.nodeList.render(this.state);
-  };
 }
 
 new App("App");

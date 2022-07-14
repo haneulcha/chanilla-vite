@@ -1,11 +1,12 @@
 const IMG_API = "http://placekitten.com/g/200/300";
 class NodeWrapper {
   // #nodeWrapper
-  constructor() {
+  constructor({ onClick }) {
     this.nodeElement = document.getElementById("nodeWrapper");
     // this.modalElement = modalEl;
 
     this.imageData;
+    this.onClick = onClick;
     this.eventHandler = (evt) => this.linkToPathEvent(evt);
     this.gobackHandler = (evt) => this.onGoback(evt);
   }
@@ -22,7 +23,8 @@ class NodeWrapper {
       this.modalElement.show(IMG_API);
       // this.modalElement.show(node.dataset.path);
     } else {
-      this.state.addPath();
+      // this.state.addPath();
+      this.onClick(node.id);
     }
   }
 
